@@ -4,9 +4,11 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UsersModule } from './users/users.module';
-import { APP_PIPE } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from './shared/utils/validator.pipe';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthGuard } from './shared/guards/auth.guard';
+import { RolesGuard } from './shared/guards/roles.guard';
 
 const configService = new ConfigService();
 @Module({
@@ -36,6 +38,14 @@ const configService = new ConfigService();
     {
       provide: APP_PIPE,
       useClass: ValidationPipe,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

@@ -85,11 +85,7 @@ export class UsersService {
     email,
     password,
   }: SignInDto): Promise<Record<string, string>> {
-    const user = await User.findOne({
-      where: { email },
-      include: [{ model: Role }],
-    });
-
+    const user = await this.fetchUserWithEmail(email);
     const isValidPassword = await bcrypt.compare(password, user.hashedPassword);
 
     if (!isValidPassword) throw new UnauthorizedException();
@@ -99,5 +95,12 @@ export class UsersService {
     const accessToken = await this.jwtService.signAsync(payload);
 
     return { accessToken };
+  }
+
+  async fetchUserWithEmail(email: string): Promise<User> {
+    return await User.findOne({
+      where: { email },
+      include: [{ model: Role }],
+    });
   }
 }

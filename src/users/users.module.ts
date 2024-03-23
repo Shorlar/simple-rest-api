@@ -10,5 +10,6 @@ import { NotifyUserService } from 'src/shared/notification/notification.service'
   imports: [SequelizeModule.forFeature([User, Role])],
   controllers: [UsersController],
   providers: [UsersService, NotifyUserService],
+  exports:[UsersService]
 })
 export class UsersModule {}
