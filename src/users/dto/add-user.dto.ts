@@ -1,9 +1,7 @@
 import {
-  IsDefined,
   IsEmail,
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsPhoneNumber,
   IsString,
 } from 'class-validator';
