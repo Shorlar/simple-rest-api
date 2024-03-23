@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AddUserDto } from './dto/add-user.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './models/user.model';
@@ -8,6 +14,9 @@ import { ConfigService } from '@nestjs/config';
 import { Roles } from 'src/shared/enums/role.enum';
 import { NotifyUserService } from 'src/shared/notification/notification.service';
 import { DBErrors } from 'src/shared/enums/errors.enum';
+import { JwtService } from '@nestjs/jwt';
+import { SignInDto } from './dto/sign-in.dto';
+import { Role } from './models/role.model';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +27,7 @@ export class UsersService {
     private userModel: User,
     private configService: ConfigService,
     private notifyUserService: NotifyUserService,
+    private jwtService: JwtService,
   ) {
     this.logger = new Logger(UsersService.name);
   }
@@ -69,5 +79,25 @@ export class UsersService {
   private generateRandomPassword(passwordLength: number): string {
     const randomPassword = randomize('Aa0', passwordLength);
     return randomPassword;
+  }
+
+  async SignIn({
+    email,
+    password,
+  }: SignInDto): Promise<Record<string, string>> {
+    const user = await User.findOne({
+      where: { email },
+      include: [{ model: Role }],
+    });
+
+    const isValidPassword = await bcrypt.compare(password, user.hashedPassword);
+
+    if (!isValidPassword) throw new UnauthorizedException();
+
+    const payload = { username: user.email };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return { accessToken };
   }
 }

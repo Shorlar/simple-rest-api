@@ -6,11 +6,17 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { UsersModule } from './users/users.module';
 import { APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from './shared/utils/validator.pipe';
+import { JwtModule } from '@nestjs/jwt';
 
 const configService = new ConfigService();
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    JwtModule.register({
+      global: true,
+      secret: configService.get<string>('JWT_SECRET'),
+      signOptions: { expiresIn: '1hr' },
+    }),
     SequelizeModule.forRoot({
       dialect: 'mysql',
       host: configService.get<string>('DB_HOST'),
