@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 
-const SERVICE_NAME = 'equity-bank-external-accounts';
+const SERVICE_NAME = 'simple-app';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {cors: true});

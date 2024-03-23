@@ -4,6 +4,7 @@ import {
   ForeignKey,
   Table,
   Model,
+  Unique,
 } from 'sequelize-typescript';
 import { Role } from './role.model';
 
@@ -12,6 +13,7 @@ export class User extends Model {
   @Column
   fullName: string;
 
+  @Unique
   @Column
   email: string;
 
