@@ -4,8 +4,10 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UsersModule } from './users/users.module';
+import { APP_PIPE } from '@nestjs/core';
+import { ValidationPipe } from './shared/utils/validator.pipe';
 
-const configService = new ConfigService()
+const configService = new ConfigService();
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -18,11 +20,17 @@ const configService = new ConfigService()
       database: configService.get<string>('DB_NAME'),
       models: [],
       autoLoadModels: true,
-      synchronize: true
+      synchronize: true,
     }),
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useClass: ValidationPipe,
+    },
+  ],
 })
 export class AppModule {}

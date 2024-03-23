@@ -1,4 +1,9 @@
-import { Column, HasMany, Table, Model } from 'sequelize-typescript';
+import {
+  Column,
+  HasMany,
+  Table,
+  Model,
+} from 'sequelize-typescript';
 import { User } from './user.model';
 
 @Table
