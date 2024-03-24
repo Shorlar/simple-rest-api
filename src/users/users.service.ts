@@ -17,6 +17,8 @@ import { DBErrors } from 'src/shared/enums/errors.enum';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
 import { Role } from './models/role.model';
+import { SignedInUser } from 'src/shared/types/signIn.user.type';
+import { GetUserDto } from './dto/get-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -85,10 +87,9 @@ export class UsersService {
     email,
     password,
   }: SignInDto): Promise<Record<string, string>> {
-    const user = await User.findOne({
-      where: { email },
-      include: [{ model: Role }],
-    });
+    const user = await this.fetchUserWithEmail(email);
+
+    if (!user) throw new UnauthorizedException();
 
     const isValidPassword = await bcrypt.compare(password, user.hashedPassword);
 
@@ -99,5 +100,33 @@ export class UsersService {
     const accessToken = await this.jwtService.signAsync(payload);
 
     return { accessToken };
+  }
+
+  async fetchUserWithEmail(email: string): Promise<User | undefined> {
+    return await User.findOne({
+      where: { email },
+      include: [{ model: Role }],
+    });
+  }
+
+  private async fetchUserWithId(id: number): Promise<User | undefined> {
+    return await User.findOne({
+      where: { id },
+    });
+  }
+
+  async getUserById(userId: number, signedInUser: SignedInUser):Promise<GetUserDto> {
+    const { id, role } = signedInUser;
+
+    let user: User = null;
+    if (role === Roles.USER) {
+      user = await this.fetchUserWithId(id);
+    } else {
+      user = await this.fetchUserWithId(userId);
+    }
+
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+    return new GetUserDto(user)
   }
 }
