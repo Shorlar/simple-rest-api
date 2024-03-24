@@ -11,13 +11,13 @@ import { User } from './models/user.model';
 import * as randomize from 'randomatic';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { Roles } from 'src/shared/enums/role.enum';
-import { NotifyUserService } from 'src/shared/notification/notification.service';
-import { DBErrors } from 'src/shared/enums/errors.enum';
+import { Roles } from '../shared/enums/role.enum';
+import { NotifyUserService } from '../shared/notification/notification.service';
+import { DBErrors } from '../shared/enums/errors.enum';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
 import { Role } from './models/role.model';
-import { SignedInUser } from 'src/shared/types/signIn.user.type';
+import { SignedInUser } from '../shared/types/signIn.user.type';
 import { GetUserDto } from './dto/get-user.dto';
 
 @Injectable()
@@ -25,8 +25,6 @@ export class UsersService {
   private logger: Logger;
 
   constructor(
-    @InjectModel(User)
-    private userModel: User,
     private configService: ConfigService,
     private notifyUserService: NotifyUserService,
     private jwtService: JwtService,
@@ -109,7 +107,7 @@ export class UsersService {
     });
   }
 
-  private async fetchUserWithId(id: number): Promise<User | undefined> {
+  async fetchUserWithId(id: number): Promise<User | undefined> {
     return await User.findOne({
       where: { id },
     });
@@ -134,7 +132,7 @@ export class UsersService {
   }
 
   async createAdminUser(): Promise<void> {
-    this.logger.log('creating admin user')
+    this.logger.log('creating admin user');
     const adminUserEmail = this.configService.get<string>('ADMIN_USER_EMAIL');
 
     const user = await this.fetchUserWithEmail(adminUserEmail);
@@ -143,8 +141,8 @@ export class UsersService {
     const randomPassword = this.generateRandomPassword(6);
     const hashedPassword = await bcrypt.hash(randomPassword, salt);
 
-    await user.update({hashedPassword})
-    await user.save()
+    await user.update({ hashedPassword });
+    await user.save();
 
     const notificationDetails = {
       fullName: user.fullName,
@@ -153,7 +151,7 @@ export class UsersService {
     };
 
     // notify admin user of their new password
-    this.notifyUserService.sendNotification(notificationDetails)
-    return
+    this.notifyUserService.sendNotification(notificationDetails);
+    return;
   }
 }

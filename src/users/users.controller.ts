@@ -9,11 +9,11 @@ import {
 import { AddUserDto } from './dto/add-user.dto';
 import { UsersService } from './users.service';
 import { SignInDto } from './dto/sign-in.dto';
-import { Public } from 'src/shared/decorators/isPublic.decorator';
-import { Role } from 'src/shared/decorators/role.decorator';
-import { Roles } from 'src/shared/enums/role.enum';
-import { SignedInUser } from 'src/shared/types/signIn.user.type';
-import { SignInUser } from 'src/shared/decorators/signIn-user.decorator';
+import { Public } from '../shared/decorators/isPublic.decorator';
+import { Role } from '../shared/decorators/role.decorator';
+import { Roles } from '../shared/enums/role.enum';
+import { SignedInUser } from '../shared/types/signIn.user.type';
+import { SignInUser } from '../shared/decorators/signIn-user.decorator';
 import { GetUserDto } from './dto/get-user.dto';
 
 @Controller('/')
