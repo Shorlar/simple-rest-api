@@ -5,7 +5,7 @@ import {
   IsPhoneNumber,
   IsString,
 } from 'class-validator';
-import { Roles } from 'src/shared/enums/role.enum';
+import { Roles } from '../../shared/enums/role.enum';
 
 export class AddUserDto {
   @IsNotEmpty()
