@@ -28,7 +28,7 @@ const configService = new ConfigService();
       database: configService.get<string>('DB_NAME'),
       models: [],
       autoLoadModels: true,
-      synchronize: true,
+      synchronize: false,
     }),
     UsersModule,
   ],
