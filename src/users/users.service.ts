@@ -115,7 +115,10 @@ export class UsersService {
     });
   }
 
-  async getUserById(userId: number, signedInUser: SignedInUser):Promise<GetUserDto> {
+  async getUserById(
+    userId: number,
+    signedInUser: SignedInUser,
+  ): Promise<GetUserDto> {
     const { id, role } = signedInUser;
 
     let user: User = null;
@@ -127,6 +130,30 @@ export class UsersService {
 
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
 
-    return new GetUserDto(user)
+    return new GetUserDto(user);
+  }
+
+  async createAdminUser(): Promise<void> {
+    this.logger.log('creating admin user')
+    const adminUserEmail = this.configService.get<string>('ADMIN_USER_EMAIL');
+
+    const user = await this.fetchUserWithEmail(adminUserEmail);
+
+    const salt = Number(this.configService.get<string>('PASSWORD_SALT'));
+    const randomPassword = this.generateRandomPassword(6);
+    const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+    await user.update({hashedPassword})
+    await user.save()
+
+    const notificationDetails = {
+      fullName: user.fullName,
+      email: user.email,
+      randomPassword,
+    };
+
+    // notify admin user of their new password
+    this.notifyUserService.sendNotification(notificationDetails)
+    return
   }
 }
